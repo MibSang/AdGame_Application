@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">AdGame</string>
     <string name="ingame_middle_string">광고</string>
+    <string name="login_string">로그인</string>
+    <string name="register_string">회원가입</string>
+    <string name="email_string">이메일</string>
+    <string name="password_string">비밀번호</string>
 </resources>

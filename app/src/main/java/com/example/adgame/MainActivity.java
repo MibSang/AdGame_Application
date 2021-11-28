@@ -1,45 +1,58 @@
 package com.example.adgame;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public final static int CARD_NUM = 5;
-    ImageView[] myCardViews = new ImageView[CARD_NUM];
-    ImageView[] opCardViews = new ImageView[CARD_NUM];
+import com.example.adgame.http.httpThread;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class MainActivity extends AppCompatActivity {
+    TextView welcome_text;
+    Button startGame_btn;
+    Button logout_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myCardViews[0] = (ImageView)findViewById(R.id.myCard1);
-        myCardViews[1] = (ImageView)findViewById(R.id.myCard2);
-        myCardViews[2] = (ImageView)findViewById(R.id.myCard3);
-        myCardViews[3] = (ImageView)findViewById(R.id.myCard4);
-        myCardViews[4] = (ImageView)findViewById(R.id.myCard5);
-        opCardViews[0] = (ImageView)findViewById(R.id.opCard1); // 추후 상대 card가 shuffle된 경우 대비 view할당
-        opCardViews[1] = (ImageView)findViewById(R.id.opCard2);
-        opCardViews[2] = (ImageView)findViewById(R.id.opCard3);
-        opCardViews[3] = (ImageView)findViewById(R.id.opCard4);
-        opCardViews[4] = (ImageView)findViewById(R.id.opCard5);
-        for (int i = 0; i < CARD_NUM; i++)
-            myCardViews[i].setOnClickListener(this);
-    }
+        welcome_text = (TextView) findViewById(R.id.welcome_text);
+        startGame_btn = (Button) findViewById(R.id.startGame_btn);
+        logout_btn = (Button) findViewById(R.id.logout_btn);
 
-    public void onClick(View v) {
-        for (int i = 0; i < CARD_NUM; i++) {
-            if (v == myCardViews[i]){
-                myCardViews[i].setColorFilter(Color.parseColor("#55ff0000"));
-                //Toast.makeText(getApplication(), "selected "+i, Toast.LENGTH_SHORT).show();
-            }
-            else {
-                myCardViews[i].setColorFilter(null);
-            }
+        SharedPreferences pref = getSharedPreferences("jwt", MODE_PRIVATE);
+        String token = pref.getString("token", "");
+        httpThread http = new httpThread();
+
+        http.setParams("/login", null, token, "POST");
+        http.start();
+        try {
+            http.join();
+            JSONObject jObj = new JSONObject(http.getRes());
+            welcome_text.setText(String.format("%s님 환영합니다.", jObj.getString("name")));
+        } catch (InterruptedException | JSONException e) {
+            e.printStackTrace();
         }
+
+        startGame_btn.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+            startActivity(intent);
+            finish();
+        });
+        logout_btn.setOnClickListener(v -> {
+            SharedPreferences.Editor edit = pref.edit();
+            edit.remove("token");
+            edit.apply();
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 }
