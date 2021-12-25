@@ -13,6 +13,9 @@
         android:theme="@style/Theme.AdGame"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".SignupActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
@@ -31,7 +34,7 @@
         </activity>
         <activity
             android:name=".GameActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
     </application>
 
 </manifest>

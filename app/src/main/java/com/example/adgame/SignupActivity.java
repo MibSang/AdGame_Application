@@ -19,59 +19,57 @@ import com.example.adgame.http.httpThread;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginActivity extends AppCompatActivity {
-    EditText email_text;
-    EditText password_text;
-    Button login_button;
-    Button register_button;
-    ProgressBar login_progress;
+public class SignupActivity extends AppCompatActivity {
+    EditText editTextName;
+    EditText editTextPassword;
+    EditText editTextPassword2;
+    EditText editTextEmail;
+    EditText editTextPhone;
+    Button signup_btn;
+    Button cancel_btn;
+    ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
 
-        email_text = (EditText) findViewById(R.id.emailText);
-        password_text = (EditText) findViewById(R.id.passwordText);
-        login_button = (Button) findViewById(R.id.loginBtn);
-        register_button = (Button) findViewById(R.id.registerBtn);
-        login_progress = (ProgressBar) findViewById(R.id.progressBar);
+        editTextName = (EditText) findViewById(R.id.editTextTextPersonName2);
+        editTextPassword = (EditText) findViewById(R.id.editTextTextPassword);
+        editTextPassword2 = (EditText) findViewById(R.id.editTextTextPassword2);
+        editTextEmail = (EditText) findViewById(R.id.editTextTextEmailAddress);
+        editTextPhone = (EditText) findViewById(R.id.editTextPhone);
+        signup_btn = (Button) findViewById(R.id.signup_btn);
+        cancel_btn = (Button) findViewById(R.id.cancel_signup);
+        progress = (ProgressBar) findViewById(R.id.progressBar_signup);
 
-        /**
-         * login button 클릭시 람다함수 실행
-         */
-        login_button.setOnClickListener(v -> {
+        signup_btn.setOnClickListener(v -> {
             ContentValues params = new ContentValues();
-            params.put("email", email_text.getText().toString());
-            params.put("pw", password_text.getText().toString());
-            SharedPreferences pref = getSharedPreferences("jwt", MODE_PRIVATE);
+            params.put("email", editTextEmail.getText().toString());
+            params.put("pw", editTextPassword.getText().toString());
+            params.put("name", editTextName.getText().toString());
+            params.put("phoneNum", editTextPhone.getText().toString());
             httpThread http = new httpThread();
-            http.setParams("/login", params, "", "GET");
-            SharedPreferences.Editor edit = pref.edit();
+            http.setParams("/login", params, "", "PUT");
 
-            login_progress.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.VISIBLE);
             http.start();
             try {
                 http.join();
                 JSONObject jObj = new JSONObject(http.getRes());
-                edit.putString("token", jObj.getString("token"));
-                edit.apply();
 
                 // shared preference 잘 작동하는지 확인 코드
                 // System.out.println(pref.getString("token", "NO VALUE SAVED!!"));
                 // login_progress.setVisibility(View.INVISIBLE);
 
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
                 finish();
             } catch (InterruptedException | JSONException e) {
                 e.printStackTrace();
             }
         });
 
-        register_button.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-            startActivity(intent);
+        cancel_btn.setOnClickListener(v -> {
+            finish();
         });
     }
 
