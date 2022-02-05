@@ -1,9 +1,11 @@
 package com.example.adgame;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,7 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.example.adgame.http.httpThread;
+import com.example.adgame.http.HttpThread;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
             params.put("email", email_text.getText().toString());
             params.put("pw", password_text.getText().toString());
             SharedPreferences pref = getSharedPreferences("jwt", MODE_PRIVATE);
-            httpThread http = new httpThread();
+            HttpThread http = new HttpThread();
             http.setParams("/login", params, "", "GET");
             SharedPreferences.Editor edit = pref.edit();
 
@@ -53,8 +55,26 @@ public class LoginActivity extends AppCompatActivity {
             http.start();
             try {
                 http.join();
+                login_progress.setVisibility(View.INVISIBLE);
                 JSONObject jObj = new JSONObject(http.getRes());
-                edit.putString("token", jObj.getString("token"));
+                String token;
+
+                if (http.getRes().equals("") || http.getRes() == null || http.getRes().equals("null"))
+                    return;
+                token = jObj.getString("token");
+                if (token.equals("") || token.equals("null")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("오류").setMessage("잘못된 로그인 정보입니다.");
+                    builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {}
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    return;
+                }
+
+                edit.putString("token", token);
                 edit.apply();
 
                 // shared preference 잘 작동하는지 확인 코드

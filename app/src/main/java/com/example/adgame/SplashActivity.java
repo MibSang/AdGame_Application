@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.example.adgame.http.httpThread;
+import com.example.adgame.http.HttpThread;
 
 public class SplashActivity extends AppCompatActivity {
     @Override
@@ -15,7 +15,7 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences("jwt", MODE_PRIVATE);
         String token = pref.getString("token", "");
         System.out.println(token);
-        httpThread http = new httpThread();
+        HttpThread http = new HttpThread();
 
         if (!token.equals("")) {
             http.setParams("/", null, token, "GET");
@@ -27,7 +27,9 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
         Intent intent;
-        if (http.getRes().equals("0"))
+        System.out.println("response");
+        System.out.println("");
+        if (!http.getRes().equals(""))
             intent = new Intent(getApplicationContext(), MainActivity.class);
         else
             intent = new Intent(getApplicationContext(), LoginActivity.class);

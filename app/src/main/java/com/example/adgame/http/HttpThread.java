@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
-public class httpThread extends Thread {
+public class HttpThread extends Thread {
     final private String _url = "http://ec2-13-124-160-65.ap-northeast-2.compute.amazonaws.com:8080";
     private String res = "";
     private String uri;
@@ -79,10 +79,14 @@ public class httpThread extends Thread {
                 reader.close();
             } else {
                 System.out.println(conn.getResponseCode());
+                res = "";
+                return;
             }
             conn.disconnect();
         } catch (IOException e) {
             e.printStackTrace();
+            res = "";
+            return;
         }
         res = receiveMsg;
     }
