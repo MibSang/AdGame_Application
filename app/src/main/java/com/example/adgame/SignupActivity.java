@@ -54,14 +54,12 @@ public class SignupActivity extends AppCompatActivity {
             http.start();
             try {
                 http.join();
-                JSONObject jObj = new JSONObject(http.getRes());
+                if (http.getRes().equals("OK"))
+                    finish();
+                else
+                    System.out.println("ERROR ON SIGNUP");
 
-                // shared preference 잘 작동하는지 확인 코드
-                // System.out.println(pref.getString("token", "NO VALUE SAVED!!"));
-                // login_progress.setVisibility(View.INVISIBLE);
-
-                finish();
-            } catch (InterruptedException | JSONException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
