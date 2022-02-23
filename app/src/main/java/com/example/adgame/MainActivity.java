@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         startGame_btn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), GameActivity.class);
             startActivity(intent);
-            finish();
         });
         logout_btn.setOnClickListener(v -> {
             SharedPreferences.Editor edit = pref.edit();
